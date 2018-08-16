@@ -77,6 +77,13 @@ class Assets {
 	const FORMAT_JS_INLINE  = '<script>%s</script>';
 
 	/**
+	 * Version
+	 *
+	 * @var string
+	 */
+	private $version;
+
+	/**
 	 * Enable the pipeline and minify functions.
 	 *
 	 * @var bool
@@ -200,9 +207,30 @@ class Assets {
 			->setNotifiers($config['notifiers'])
 			->setInlineThreshold($config['inline_threshold'])
 			->setGzipStatic($config['gzip_static'])
-			->setCollections($config['collections']);
+			->setCollections($config['collections'])
+			->setVersion($config['version']);
 
 		$this->public = $filesystem;
+	}
+
+	/**
+	 * @param string $version
+	 *
+	 * @return Assets
+	 */
+	public function setVersion($version) {
+		$this->version = $version;
+
+		return $this;
+	}
+
+	/**
+	 * @param string $version
+	 *
+	 * @return Assets
+	 */
+	public function getVersion() {
+		return $this->version;
 	}
 
 	/**
@@ -546,10 +574,10 @@ class Assets {
 			if ($inline_threshold > 0 && $this->public->getSize($asset_file) <= $inline_threshold) {
 				return sprintf($format_inline, $this->public->read($asset_file));
 			} else {
-				return $this->htmlLinks($url, [$hash], '.min' . $extension, $format_link, $attributes);
+				return $this->htmlLinks($url, [$hash], '.min' . $extension.'?v='.$this->getVersion(), $format_link, $attributes);
 			}
 		} else {
-			return $this->htmlLinks($url, $hashes, $extension, $format_link, $attributes);
+			return $this->htmlLinks($url, $hashes, $extension.'?v='.$this->getVersion(), $format_link, $attributes);
 		}
 	}
 
